@@ -58,9 +58,11 @@ white =
 
 view : Model -> Html Msg
 view model =
-    layout []
+    layout
+        [ Font.family [ Font.typeface "Lato", Font.sansSerif ]
+        ]
         (column
-            [ width fill, height fill, spacing 20 ]
+            [ width fill, height fill ]
             [ viewScoreBoard model
             , viewResetButton
             ]
@@ -70,19 +72,36 @@ view model =
 viewScoreBoard : Model -> Element Msg
 viewScoreBoard model =
     wrappedRow
-        [ spacing 20 ]
-        [ viewPointPad LeftScore model.left
-        , viewPointPad RightScore model.right
+        [ spaceEvenly
+        , width fill
+        , height fill
+        ]
+        [ viewPointPad "Player A" LeftScore model.left
+        , viewPointPad "Player B" RightScore model.right
         ]
 
 
-viewPointPad : Msg -> Int -> Element Msg
-viewPointPad msg score =
-    Input.button
-        []
-        { onPress = Just msg
-        , label = text (String.fromInt score)
-        }
+viewPointPad : String -> Msg -> Int -> Element Msg
+viewPointPad label msg score =
+    column
+        [ width fill
+        , height fill
+        ]
+        [ Element.el
+            [ alignTop
+            , centerX
+            , padding 5
+            ]
+            (text label)
+        , Input.button
+            [ width (minimum 300 fill)
+            , height fill
+            , Font.size 120
+            ]
+            { onPress = Just msg
+            , label = el [ centerX, centerY ] (text (String.fromInt score))
+            }
+        ]
 
 
 viewResetButton : Element Msg
