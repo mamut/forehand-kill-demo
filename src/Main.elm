@@ -1,8 +1,9 @@
 module Main exposing (..)
 
 import Browser
-import Html exposing (..)
-import Html.Events exposing (..)
+import Element
+import Element.Input as Input
+import Html exposing (Html)
 
 
 type alias Model =
@@ -39,21 +40,46 @@ update msg model =
 
 view : Model -> Html Msg
 view model =
-    div []
-        [ div []
-            [ button
-                [ onClick LeftScore ]
-                [ text (String.fromInt model.left) ]
-            , button
-                [ onClick RightScore ]
-                [ text (String.fromInt model.right) ]
+    Element.layout []
+        (Element.column
+            []
+            [ viewScoreBoard model
+            , viewResetButton
             ]
-        , button
-            [ onClick ResetScore ]
-            [ text "Reset" ]
+        )
+
+
+viewScoreBoard : Model -> Element.Element Msg
+viewScoreBoard model =
+    Element.wrappedRow
+        []
+        [ viewPointPad LeftScore model.left
+        , viewPointPad RightScore model.right
         ]
+
+
+viewPointPad : Msg -> Int -> Element.Element Msg
+viewPointPad msg score =
+    Input.button
+        []
+        { onPress = Just msg
+        , label = Element.text (String.fromInt score)
+        }
+
+
+viewResetButton : Element.Element Msg
+viewResetButton =
+    Input.button
+        []
+        { onPress = Just ResetScore
+        , label = Element.text "Reset"
+        }
 
 
 main : Program () Model Msg
 main =
-    Browser.sandbox { init = init, view = view, update = update }
+    Browser.sandbox
+        { init = init
+        , view = view
+        , update = update
+        }
