@@ -1,28 +1,59 @@
 module Main exposing (..)
 
 import Browser
-import Html exposing (Html, div, text)
+import Html exposing (..)
+import Html.Events exposing (..)
 
 
 type alias Model =
-    {}
+    { left : Int
+    , right : Int
+    }
 
 
 init : Model
 init =
-    {}
+    { left = 0
+    , right = 0
+    }
 
 
-update : msg -> Model -> Model
-update _ model =
-    model
+type Msg
+    = LeftScore
+    | RightScore
+    | ResetScore
 
 
-view : Model -> Html msg
+update : Msg -> Model -> Model
+update msg model =
+    case msg of
+        LeftScore ->
+            { model | left = model.left + 1 }
+
+        RightScore ->
+            { model | right = model.right + 1 }
+
+        ResetScore ->
+            init
+
+
+view : Model -> Html Msg
 view model =
-    div [] [ text "test" ]
+    div []
+        [ div []
+            [ button
+                [ onClick LeftScore ]
+                [ text (String.fromInt model.left) ]
+            , button
+                [ onClick RightScore ]
+                [ text (String.fromInt model.right) ]
+            ]
+        , button
+            [ onClick ResetScore ]
+            [ text "Reset" ]
+        ]
 
 
-main : Program () Model msg
+main : Program () Model Msg
 main =
     Browser.sandbox { init = init, view = view, update = update }
