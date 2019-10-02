@@ -1,7 +1,10 @@
 module Main exposing (..)
 
 import Browser
-import Element
+import Element exposing (..)
+import Element.Background as Background
+import Element.Border as Border
+import Element.Font as Font
 import Element.Input as Input
 import Html exposing (Html)
 
@@ -38,41 +41,64 @@ update msg model =
             init
 
 
+darkGreen : Color
+darkGreen =
+    rgb255 66 128 81
+
+
+green : Color
+green =
+    rgb255 82 128 98
+
+
+white : Color
+white =
+    rgb255 255 255 255
+
+
 view : Model -> Html Msg
 view model =
-    Element.layout []
-        (Element.column
-            []
+    layout []
+        (column
+            [ width fill, height fill, spacing 20 ]
             [ viewScoreBoard model
             , viewResetButton
             ]
         )
 
 
-viewScoreBoard : Model -> Element.Element Msg
+viewScoreBoard : Model -> Element Msg
 viewScoreBoard model =
-    Element.wrappedRow
-        []
+    wrappedRow
+        [ spacing 20 ]
         [ viewPointPad LeftScore model.left
         , viewPointPad RightScore model.right
         ]
 
 
-viewPointPad : Msg -> Int -> Element.Element Msg
+viewPointPad : Msg -> Int -> Element Msg
 viewPointPad msg score =
     Input.button
         []
         { onPress = Just msg
-        , label = Element.text (String.fromInt score)
+        , label = text (String.fromInt score)
         }
 
 
-viewResetButton : Element.Element Msg
+viewResetButton : Element Msg
 viewResetButton =
     Input.button
-        []
+        [ alignBottom
+        , width fill
+        , height (px 50)
+        , Background.color darkGreen
+        , Font.bold
+        , Font.color white
+        , Border.color green
+        , Border.widthEach { bottom = 0, top = 3, right = 0, left = 0 }
+        ]
         { onPress = Just ResetScore
-        , label = Element.text "Reset"
+        , label = Element.el [ centerX ] (text "Reset")
         }
 
 
