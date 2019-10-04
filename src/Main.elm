@@ -12,6 +12,7 @@ import Html exposing (Html)
 type alias Model =
     { left : Int
     , right : Int
+    , gameState : GameState
     }
 
 
@@ -19,7 +20,18 @@ init : Model
 init =
     { left = 0
     , right = 0
+    , gameState = Won PlayerA
     }
+
+
+type Player
+    = PlayerA
+    | PlayerB
+
+
+type GameState
+    = Playing
+    | Won Player
 
 
 type Msg
@@ -56,14 +68,33 @@ white =
     rgb255 255 255 255
 
 
+playerName : Player -> String
+playerName player =
+    case player of
+        PlayerA ->
+            "Player A"
+
+        PlayerB ->
+            "Player B"
+
+
 view : Model -> Html Msg
 view model =
+    let
+        screen =
+            case model.gameState of
+                Playing ->
+                    viewScoreBoard model
+
+                Won player ->
+                    viewWinScreen player model
+    in
     layout
         [ Font.family [ Font.typeface "Lato", Font.sansSerif ]
         ]
         (column
             [ width fill, height fill ]
-            [ viewScoreBoard model
+            [ screen
             , viewResetButton
             ]
         )
@@ -119,6 +150,29 @@ viewResetButton =
         { onPress = Just ResetScore
         , label = Element.el [ centerX ] (text "Reset")
         }
+
+
+viewWinScreen : Player -> Model -> Element Msg
+viewWinScreen player model =
+    column
+        [ width fill
+        , height fill
+        , spacing 20
+        , Font.bold
+        ]
+        [ el
+            [ centerX
+            , centerY
+            , Font.size 40
+            ]
+            (text (playerName player ++ " won the game!"))
+        , el
+            [ centerX
+            , centerY
+            , Font.size 60
+            ]
+            (text (String.fromInt model.left ++ " : " ++ String.fromInt model.right))
+        ]
 
 
 main : Program () Model Msg
