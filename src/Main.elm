@@ -186,7 +186,7 @@ viewWinScreen player model =
         [ el
             [ centerX
             , centerY
-            , Font.size 40
+            , Font.size 30
             ]
             (text (playerName player ++ " won the game!"))
         , el

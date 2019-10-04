@@ -1,4 +1,4 @@
-.PHONY: all browser
+.PHONY: all browser optimized
 
 all: dist/elm.js dist/index.html
 
@@ -10,3 +10,7 @@ dist/index.html: index.html
 
 browser: all
 	open dist/index.html
+
+optimized:
+	elm make --optimize src/Main.elm --output dist/elm.js
+	cp index.html dist/index.html
