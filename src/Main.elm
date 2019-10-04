@@ -20,7 +20,7 @@ init : Model
 init =
     { left = 0
     , right = 0
-    , gameState = Won PlayerA
+    , gameState = Playing
     }
 
 
@@ -40,14 +40,37 @@ type Msg
     | ResetScore
 
 
+checkForWin : Int -> Int -> Player -> GameState
+checkForWin currentPlayerScore otherPlayerScore player =
+    if currentPlayerScore >= 11 && (currentPlayerScore - otherPlayerScore) >= 2 then
+        Won player
+
+    else
+        Playing
+
+
 update : Msg -> Model -> Model
 update msg model =
     case msg of
         LeftScore ->
-            { model | left = model.left + 1 }
+            let
+                newLeftScore =
+                    model.left + 1
+            in
+            { model
+                | left = newLeftScore
+                , gameState = checkForWin newLeftScore model.right PlayerA
+            }
 
         RightScore ->
-            { model | right = model.right + 1 }
+            let
+                newRightScore =
+                    model.right + 1
+            in
+            { model
+                | right = newRightScore
+                , gameState = checkForWin newRightScore model.left PlayerB
+            }
 
         ResetScore ->
             init
