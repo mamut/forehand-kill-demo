@@ -38,6 +38,7 @@ type Msg
     = LeftScore
     | RightScore
     | ResetScore
+    | Undo
 
 
 checkForWin : Int -> Int -> Player -> GameState
@@ -74,6 +75,9 @@ update msg model =
 
         ResetScore ->
             init
+
+        Undo ->
+            model
 
 
 darkGreen : Color
@@ -118,7 +122,14 @@ view model =
         (column
             [ width fill, height fill ]
             [ screen
-            , viewResetButton
+            , row
+                [ alignBottom
+                , width fill
+                , height (px 50)
+                ]
+                [ viewUndoButton
+                , viewResetButton
+                ]
             ]
         )
 
@@ -158,20 +169,34 @@ viewPointPad label msg score =
         ]
 
 
-viewResetButton : Element Msg
-viewResetButton =
+viewBottomButton : { onPress : Maybe Msg, label : Element Msg } -> Element Msg
+viewBottomButton options =
     Input.button
         [ alignBottom
         , width fill
-        , height (px 50)
+        , height fill
         , Background.color darkGreen
         , Font.bold
         , Font.color white
         , Border.color green
         , Border.widthEach { bottom = 0, top = 3, right = 0, left = 0 }
         ]
+        options
+
+
+viewResetButton : Element Msg
+viewResetButton =
+    viewBottomButton
         { onPress = Just ResetScore
         , label = Element.el [ centerX ] (text "Reset")
+        }
+
+
+viewUndoButton : Element Msg
+viewUndoButton =
+    viewBottomButton
+        { onPress = Just Undo
+        , label = Element.el [ centerX ] (text "Undo")
         }
 
 
