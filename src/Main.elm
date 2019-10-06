@@ -18,6 +18,7 @@ type alias Game =
 
 type alias Model =
     { game : Game
+    , undo : Maybe Game
     }
 
 
@@ -28,6 +29,7 @@ init =
         , right = 0
         , state = Playing
         }
+    , undo = Nothing
     }
 
 
@@ -45,7 +47,7 @@ type Msg
     = LeftScore
     | RightScore
     | ResetScore
-    | Undo
+    | Undo Game
 
 
 checkForWin : Int -> Int -> Player -> GameState
@@ -75,6 +77,7 @@ update msg model =
                         | left = newLeftScore
                         , state = checkForWin newLeftScore game.right PlayerA
                     }
+                , undo = Just game
             }
 
         RightScore ->
@@ -88,13 +91,17 @@ update msg model =
                         | right = newRightScore
                         , state = checkForWin newRightScore game.left PlayerB
                     }
+                , undo = Just game
             }
 
         ResetScore ->
             init
 
-        Undo ->
-            model
+        Undo undo ->
+            { model
+                | game = undo
+                , undo = Nothing
+            }
 
 
 darkGreen : Color
@@ -144,7 +151,7 @@ view model =
                 , width fill
                 , height (px 50)
                 ]
-                [ viewUndoButton
+                [ viewUndoButton model.undo
                 , viewResetButton
                 ]
             ]
@@ -209,12 +216,17 @@ viewResetButton =
         }
 
 
-viewUndoButton : Element Msg
-viewUndoButton =
-    viewBottomButton
-        { onPress = Just Undo
-        , label = Element.el [ centerX ] (text "Undo")
-        }
+viewUndoButton : Maybe Game -> Element Msg
+viewUndoButton maybeGame =
+    case maybeGame of
+        Just game ->
+            viewBottomButton
+                { onPress = Just (Undo game)
+                , label = Element.el [ centerX ] (text "Undo")
+                }
+
+        Nothing ->
+            el [ alignBottom, width fill, height fill, Background.color darkGreen ] (text "")
 
 
 viewWinScreen : Player -> Game -> Element Msg
