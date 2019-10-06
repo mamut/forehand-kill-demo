@@ -9,18 +9,25 @@ import Element.Input as Input
 import Html exposing (Html)
 
 
-type alias Model =
+type alias Game =
     { left : Int
     , right : Int
-    , gameState : GameState
+    , state : GameState
+    }
+
+
+type alias Model =
+    { game : Game
     }
 
 
 init : Model
 init =
-    { left = 0
-    , right = 0
-    , gameState = Playing
+    { game =
+        { left = 0
+        , right = 0
+        , state = Playing
+        }
     }
 
 
@@ -52,25 +59,35 @@ checkForWin currentPlayerScore otherPlayerScore player =
 
 update : Msg -> Model -> Model
 update msg model =
+    let
+        { game } =
+            model
+    in
     case msg of
         LeftScore ->
             let
                 newLeftScore =
-                    model.left + 1
+                    game.left + 1
             in
             { model
-                | left = newLeftScore
-                , gameState = checkForWin newLeftScore model.right PlayerA
+                | game =
+                    { game
+                        | left = newLeftScore
+                        , state = checkForWin newLeftScore game.right PlayerA
+                    }
             }
 
         RightScore ->
             let
                 newRightScore =
-                    model.right + 1
+                    game.right + 1
             in
             { model
-                | right = newRightScore
-                , gameState = checkForWin newRightScore model.left PlayerB
+                | game =
+                    { game
+                        | right = newRightScore
+                        , state = checkForWin newRightScore game.left PlayerB
+                    }
             }
 
         ResetScore ->
@@ -109,12 +126,12 @@ view : Model -> Html Msg
 view model =
     let
         screen =
-            case model.gameState of
+            case model.game.state of
                 Playing ->
-                    viewScoreBoard model
+                    viewScoreBoard model.game
 
                 Won player ->
-                    viewWinScreen player model
+                    viewWinScreen player model.game
     in
     layout
         [ Font.family [ Font.typeface "Lato", Font.sansSerif ]
@@ -134,15 +151,15 @@ view model =
         )
 
 
-viewScoreBoard : Model -> Element Msg
-viewScoreBoard model =
+viewScoreBoard : Game -> Element Msg
+viewScoreBoard game =
     wrappedRow
         [ spaceEvenly
         , width fill
         , height fill
         ]
-        [ viewPointPad "Player A" LeftScore model.left
-        , viewPointPad "Player B" RightScore model.right
+        [ viewPointPad "Player A" LeftScore game.left
+        , viewPointPad "Player B" RightScore game.right
         ]
 
 
@@ -200,8 +217,8 @@ viewUndoButton =
         }
 
 
-viewWinScreen : Player -> Model -> Element Msg
-viewWinScreen player model =
+viewWinScreen : Player -> Game -> Element Msg
+viewWinScreen player game =
     column
         [ width fill
         , height fill
@@ -219,7 +236,7 @@ viewWinScreen player model =
             , centerY
             , Font.size 60
             ]
-            (text (String.fromInt model.left ++ " : " ++ String.fromInt model.right))
+            (text (String.fromInt game.left ++ " : " ++ String.fromInt game.right))
         ]
 
 
